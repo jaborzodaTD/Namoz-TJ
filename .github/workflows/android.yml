@@ -28,6 +28,11 @@ jobs:
       - name: Verify Gradle environment
         run: gradle --version
 
+      - name: Remove documentation accidentally placed in Android res directories
+        run: |
+          rm -f app/src/main/res/drawable/README.md
+          rm -f app/src/main/res/raw/CONTENT_SOURCES.md
+
       - name: Assemble debug APK
         run: gradle :app:test :app:assembleDebug --stacktrace --no-daemon
 
