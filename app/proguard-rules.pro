@@ -1,0 +1,1 @@
+# Namoz TJ release rules
