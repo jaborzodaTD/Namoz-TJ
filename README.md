@@ -1,22 +1,19 @@
 # Namoz TJ 🕌
 
-Premium Android Islamic app focused on reliability, offline-first content and broad device compatibility.
+A production-oriented Islamic Android application focused on accurate, offline-first content and reliable prayer reminders.
 
-## Current foundation
-- Java 17
-- Android API 24–36
-- Material 3
-- Premium dark UI foundation
-- GitHub Actions debug APK build
-- No mandatory network connection for the basic shell
+## Planned content library
+- Qur'an: all 114 surahs, Arabic text, Tajik and Russian translations.
+- Duas: morning/evening, prayer, after Fajr, after meals, before sleep, Tahajjud, travel, protection, forgiveness, family, rizq/baraka and Qur'anic supplications.
+- Prayer times: location/manual city, calculation-method and madhhab settings.
+- Azan: notification channel + scheduled alarm foundation, with user-selectable sound mode.
+- Qibla, Tasbih, Islamic calendar, bookmarks, search and reading preferences.
 
-## Roadmap
-1. Prayer-time engine with city/location selection and calculation-method settings.
-2. Offline Qur'an: 114 surahs with verified Arabic and licensed translations.
-3. Duas, bookmarks, search and reading preferences.
-4. Qibla compass with sensor fallback.
-5. Tasbih and Islamic calendar.
-6. Notifications/Azan with Android-version-safe behavior.
-7. Automated lint/tests and release hardening.
+## Content integrity
+Qur'an and hadith/dua text is not generated from memory. Production content will be imported from verified/licensed sources, preserving Arabic text and attribution. Metadata is separated from content so translations and future languages can be updated without rewriting the app.
 
-Religious source texts will be imported from verified sources with appropriate licensing/attribution rather than generated from memory.
+## Reliability
+Core content is designed to work offline. Prayer alarms use Android alarm APIs with an inexact fallback where exact alarms are unavailable. Notification permission is requested only when needed.
+
+## Build
+GitHub Actions builds the debug APK with Java 17.
