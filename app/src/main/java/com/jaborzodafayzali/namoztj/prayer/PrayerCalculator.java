@@ -28,7 +28,7 @@ public final class PrayerCalculator {
         double fajr=noon-ha(lat,decl,angles[0]), sunrise=noon-ha(lat,decl,-0.833);
         double sunset=noon+ha(lat,decl,-0.833), isha=noon+ha(lat,decl,angles[1]);
         double factor=school==SCHOOL_HANAFI?2.0:1.0;
-        double asr=noon+ha(lat,decl,-Math.toDegrees(Math.atan(1.0/(factor+Math.tan(Math.abs(r(lat)-decl)))));
+        double asrAngle=Math.toDegrees(Math.atan(1.0/(factor+Math.tan(Math.abs(r(lat)-decl)))));\n        double asr=noon+ha(lat,decl,-asrAngle);
         List<PrayerTime> out=new ArrayList<>();
         out.add(new PrayerTime("fajr","Fajr",fmt(fajr))); out.add(new PrayerTime("dhuhr","Dhuhr",fmt(noon)));
         out.add(new PrayerTime("asr","Asr",fmt(asr))); out.add(new PrayerTime("maghrib","Maghrib",fmt(sunset))); out.add(new PrayerTime("isha","Isha",fmt(isha)));
