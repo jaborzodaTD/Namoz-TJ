@@ -1,0 +1,4 @@
+AZAN_AUDIO
+This placeholder marks the required offline azan asset location.
+Replace this file with a verified, appropriately licensed azan MP3 before release.
+Expected runtime resource: R.raw.azan
