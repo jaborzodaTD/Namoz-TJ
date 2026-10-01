@@ -3,4 +3,19 @@
     <string name="tagline">Намоз, Қуръон ва зикр — ҳамеша бо шумо</string>
     <string name="notification_channel_azan">Азон — вақти намоз</string>
     <string name="notification_channel_azan_desc">Огоҳинома ва садои азон ҳангоми фарорасии вақти намоз</string>
+    <string name="today">Сегодня</string>
+    <string name="quran">Қуръон</string>
+    <string name="duas">Дуоҳо</string>
+    <string name="favorites">Избранное</string>
+    <string name="qibla">Қибла</string>
+    <string name="tasbih">Тасбеҳ</string>
+    <string name="calendar">Тақвими исломӣ</string>
+    <string name="settings">Танзимот</string>
+    <string name="language">Забон</string>
+    <string name="version">Версия %1$s</string>
+    <string name="fajr">Фаҷр</string>
+    <string name="dhuhr">Зуҳр</string>
+    <string name="asr">Аср</string>
+    <string name="maghrib">Мағриб</string>
+    <string name="isha">Ишо</string>
 </resources>
