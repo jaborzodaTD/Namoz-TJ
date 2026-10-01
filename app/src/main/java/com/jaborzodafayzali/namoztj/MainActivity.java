@@ -1,105 +1,15 @@
 package com.jaborzodafayzali.namoztj;
-
-import android.Manifest;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.os.Build;
-import android.os.Bundle;
-import android.provider.Settings;
-import android.view.Gravity;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import com.google.android.material.card.MaterialCardView;
-import com.jaborzodafayzali.namoztj.prayer.PrayerCalculator;
-import com.jaborzodafayzali.namoztj.prayer.PrayerSettings;
-import com.jaborzodafayzali.namoztj.prayer.PrayerTime;
-import java.util.Calendar;
-import java.util.List;
-import java.util.TimeZone;
-
-public class MainActivity extends AppCompatActivity {
-    private static final int NOTIFICATION_REQUEST=7001;
-    private int dp(float v){return (int)(v*getResources().getDisplayMetrics().density+0.5f);}
-    private TextView text(String s,float size,int color,boolean bold){
-        TextView t=new TextView(this);t.setText(s);t.setTextSize(size);t.setTextColor(color);
-        t.setTypeface(Typeface.DEFAULT,bold?Typeface.BOLD:Typeface.NORMAL);t.setGravity(Gravity.CENTER_VERTICAL);return t;
-    }
-    private MaterialCardView card(String title,String subtitle){
-        MaterialCardView c=new MaterialCardView(this);c.setRadius(dp(22));c.setCardBackgroundColor(Color.rgb(16,27,43));
-        c.setStrokeWidth(dp(1));c.setStrokeColor(Color.rgb(35,55,75));
-        LinearLayout box=new LinearLayout(this);box.setOrientation(LinearLayout.VERTICAL);box.setPadding(dp(18),dp(14),dp(18),dp(14));
-        box.addView(text(title,18,Color.WHITE,true),new LinearLayout.LayoutParams(-1,dp(30)));
-        box.addView(text(subtitle,13,Color.rgb(170,183,199),false),new LinearLayout.LayoutParams(-1,dp(42)));
-        c.addView(box);return c;
-    }
-    @Override protected void onCreate(Bundle state){
-        LanguageManager.apply(this);super.onCreate(state);
-        getWindow().setStatusBarColor(Color.rgb(7,17,31));getWindow().setNavigationBarColor(Color.rgb(7,17,31));
-        PrayerNotificationHelper.createChannel(this);requestNotifications();
-        render();
-    }
-    @Override protected void onResume(){super.onResume(); if(android.os.Build.VERSION.SDK_INT>=31) ensureExactAlarmAccess(); render();}
-    private void render(){
-        LinearLayout content=new LinearLayout(this);content.setOrientation(LinearLayout.VERTICAL);content.setPadding(dp(20),dp(18),dp(20),dp(20));content.setBackgroundColor(Color.rgb(7,17,31));
-        content.addView(text(getString(R.string.app_name),28,Color.WHITE,true),new LinearLayout.LayoutParams(-1,dp(44)));
-        content.addView(text(getString(R.string.tagline),14,Color.rgb(170,183,199),false),new LinearLayout.LayoutParams(-1,dp(34)));
-
-        Calendar now=Calendar.getInstance(TimeZone.getDefault());
-        List<PrayerTime> prayers=PrayerCalculator.calculate(PrayerSettings.latitude(this),PrayerSettings.longitude(this),now,TimeZone.getDefault(),PrayerSettings.method(this),PrayerSettings.school(this));
-        String next=findNext(prayers);
-        MaterialCardView hero=card(getString(R.string.today),"Next: "+next);
-        hero.setCardBackgroundColor(Color.rgb(12,45,47));content.addView(hero,new LinearLayout.LayoutParams(-1,dp(92)));
-
-        for(PrayerTime p:prayers){
-            MaterialCardView c=card(label(p.id()),p.time());
-            content.addView(c,new LinearLayout.LayoutParams(-1,dp(74)));
-            LinearLayout.LayoutParams lp=(LinearLayout.LayoutParams)c.getLayoutParams();lp.bottomMargin=dp(8);c.setLayoutParams(lp);
-        }
-        add(content,"📖  "+getString(R.string.quran),"114 "+getString(R.string.quran)+" • offline architecture");
-        add(content,"🤲  "+getString(R.string.duas),getString(R.string.duas)+" • "+getString(R.string.favorites));
-        add(content,"🧭  "+getString(R.string.qibla),getString(R.string.qibla));
-        add(content,"📿  "+getString(R.string.tasbih),getString(R.string.tasbih));
-        add(content,"📅  "+getString(R.string.calendar),getString(R.string.calendar));
-        add(content,"⚙  "+getString(R.string.settings),getString(R.string.language));
-        TextView footer=text(String.format(getString(R.string.version),"1.0.0"),12,Color.rgb(120,140,160),false);footer.setGravity(Gravity.CENTER);content.addView(footer,new LinearLayout.LayoutParams(-1,dp(28)));
-        ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);scroll.addView(content);setContentView(scroll);
-        scheduleToday(prayers);
-    }
-    private void add(LinearLayout p,String a,String b){MaterialCardView c=card(a,b);p.addView(c,new LinearLayout.LayoutParams(-1,dp(78)));LinearLayout.LayoutParams lp=(LinearLayout.LayoutParams)c.getLayoutParams();lp.bottomMargin=dp(9);c.setLayoutParams(lp);}
-    private String label(String id){
-        if("fajr".equals(id))return getString(R.string.fajr);
-        if("dhuhr".equals(id))return getString(R.string.dhuhr);
-        if("asr".equals(id))return getString(R.string.asr);
-        if("maghrib".equals(id))return getString(R.string.maghrib);
-        return getString(R.string.isha);
-    }
-    private String findNext(List<PrayerTime> list){
-        String now=new java.text.SimpleDateFormat("HH:mm",java.util.Locale.US).format(new java.util.Date());
-        for(PrayerTime p:list)if(p.time().compareTo(now)>=0)return label(p.id())+" • "+p.time();
-        return label(list.get(0).id())+" • "+list.get(0).time()+" (tomorrow)";
-    }
-    private void scheduleToday(List<PrayerTime> list){
-        Calendar base=Calendar.getInstance();
-        for(PrayerTime p:list){
-            String[] x=p.time().split(":");Calendar at=(Calendar)base.clone();at.set(Calendar.HOUR_OF_DAY,Integer.parseInt(x[0]));at.set(Calendar.MINUTE,Integer.parseInt(x[1]));at.set(Calendar.SECOND,0);at.set(Calendar.MILLISECOND,0);
-            PrayerAlarmScheduler.schedule(this,at.getTimeInMillis(),label(p.id()),p.time());
-        }
-    }
-    private void ensureExactAlarmAccess(){
-        AlarmManager am=(AlarmManager)getSystemService(Context.ALARM_SERVICE);
-        if(am!=null&&!am.canScheduleExactAlarms()){}
-    }
-    private void requestNotifications(){
-        if(Build.VERSION.SDK_INT>=33&&ContextCompat.checkSelfPermission(this,Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED)
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.POST_NOTIFICATIONS},NOTIFICATION_REQUEST);
-    }
+import android.Manifest;import android.content.*;import android.content.pm.PackageManager;import android.graphics.*;import android.location.*;import android.os.*;import android.view.*;import android.widget.*;import androidx.appcompat.app.AppCompatActivity;import androidx.core.app.ActivityCompat;import androidx.core.content.ContextCompat;import com.google.android.material.card.MaterialCardView;import com.jaborzodafayzali.namoztj.prayer.*;import java.util.*;
+public class MainActivity extends AppCompatActivity{
+ int D(float x){return(int)(x*getResources().getDisplayMetrics().density+.5f);} TextView T(String s,float z,int c,boolean b){TextView t=new TextView(this);t.setText(s);t.setTextSize(z);t.setTextColor(c);t.setTypeface(Typeface.DEFAULT,b?1:0);return t;}
+ MaterialCardView C(String i,String a,String b,String type){MaterialCardView c=new MaterialCardView(this);c.setRadius(D(24));c.setCardBackgroundColor(Color.rgb(19,31,48));c.setStrokeWidth(D(1));c.setStrokeColor(Color.rgb(42,64,86));c.setOnClickListener(v->startActivity(new Intent(this,FeatureActivity.class).putExtra("type",type)));LinearLayout l=new LinearLayout(this);l.setGravity(16);l.setPadding(D(15),D(13),D(15),D(13));TextView q=T(i,27,Color.WHITE,false);q.setGravity(17);l.addView(q,new LinearLayout.LayoutParams(D(52),-1));LinearLayout x=new LinearLayout(this);x.setOrientation(LinearLayout.VERTICAL);x.addView(T(a,17,Color.WHITE,true));x.addView(T(b,12,Color.rgb(158,175,194),false));l.addView(x,new LinearLayout.LayoutParams(0,-2,1));c.addView(l);return c;}
+ protected void onCreate(Bundle b){LanguageManager.apply(this);super.onCreate(b);getWindow().setStatusBarColor(Color.rgb(7,16,28));getWindow().setNavigationBarColor(Color.rgb(7,16,28));PrayerNotificationHelper.createChannel(this);notifyPermission();locationPermission();draw();}
+ void draw(){LinearLayout r=new LinearLayout(this);r.setOrientation(LinearLayout.VERTICAL);r.setBackgroundColor(Color.rgb(7,16,28));LinearLayout h=new LinearLayout(this);h.setOrientation(LinearLayout.VERTICAL);h.setPadding(D(20),D(18),D(20),D(8));h.addView(T("NAMOZ TJ",12,Color.rgb(103,195,170),true));h.addView(T("Твоя вера. Твоё время.",27,Color.WHITE,true));h.addView(T("📍 "+(PrayerSettings.hasLocation(this)?"Местоположение определено":"Определяем местоположение…"),13,Color.rgb(163,181,201),false));r.addView(h,new LinearLayout.LayoutParams(-1,D(108)));ScrollView s=new ScrollView(this);LinearLayout g=new LinearLayout(this);g.setOrientation(LinearLayout.VERTICAL);g.setPadding(D(16),D(5),D(16),D(24));PrayerTime n=next();MaterialCardView hero=C("🕌","Следующий намаз",n==null?"—":n.name()+"  •  "+n.time(),"prayer");hero.setCardBackgroundColor(Color.rgb(13,65,61));g.addView(hero,new LinearLayout.LayoutParams(-1,D(105)));add(g,C("📖","Коран","114 сур • арабский + тоҷикӣ","quran"));add(g,C("🕰️","Время намаза","5 молитв • уведомления","prayer"));add(g,C("🤲","Дуа","50 избранных дуа","duas"));add(g,C("📿","Тасбих","Зикр • счётчик • цели","tasbih"));add(g,C("🧭","Кибла","Направление к Каабе","qibla"));add(g,C("📅","Исламский календарь","Хиджра и даты","calendar"));add(g,C("⚙️","Настройки","Язык • расчёт • уведомления","settings"));g.addView(T("JABORZODA FAYZALI  •  Namoz TJ",11,Color.rgb(102,120,140),false),new LinearLayout.LayoutParams(-1,D(40)));s.addView(g);r.addView(s,new LinearLayout.LayoutParams(-1,0,1));setContentView(r);}
+ void add(LinearLayout g,View v){g.addView(v,new LinearLayout.LayoutParams(-1,D(82)));LinearLayout.LayoutParams p=(LinearLayout.LayoutParams)v.getLayoutParams();p.bottomMargin=D(9);v.setLayoutParams(p);}
+ PrayerTime next(){Calendar c=Calendar.getInstance();List<PrayerTime> a=PrayerCalculator.calculate(PrayerSettings.latitude(this),PrayerSettings.longitude(this),c,TimeZone.getDefault(),PrayerSettings.method(this),PrayerSettings.school(this));String now=new java.text.SimpleDateFormat("HH:mm",Locale.US).format(new Date());for(PrayerTime x:a)if(x.time().compareTo(now)>=0)return x;return a.isEmpty()?null:a.get(0);}
+ void locationPermission(){if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED)ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},4101);else locate();}
+ void locate(){try{LocationManager m=(LocationManager)getSystemService(LOCATION_SERVICE);Location best=null;for(String p:new String[]{LocationManager.GPS_PROVIDER,LocationManager.NETWORK_PROVIDER})if(m.isProviderEnabled(p)){Location x=m.getLastKnownLocation(p);if(x!=null&&(best==null||x.getTime()>best.getTime()))best=x;}if(best!=null)PrayerSettings.saveLocation(this,best.getLatitude(),best.getLongitude());schedule();}catch(Exception e){}}
+ void schedule(){Calendar c=Calendar.getInstance();for(PrayerTime x:PrayerCalculator.calculate(PrayerSettings.latitude(this),PrayerSettings.longitude(this),c,TimeZone.getDefault(),PrayerSettings.method(this),PrayerSettings.school(this))){String[] z=x.time().split(":");Calendar a=(Calendar)c.clone();a.set(Calendar.HOUR_OF_DAY,Integer.parseInt(z[0]));a.set(Calendar.MINUTE,Integer.parseInt(z[1]));a.set(Calendar.SECOND,0);a.set(Calendar.MILLISECOND,0);if(a.before(Calendar.getInstance()))a.add(Calendar.DAY_OF_YEAR,1);PrayerAlarmScheduler.schedule(this,a.getTimeInMillis(),x.name(),x.time());}}
+ void notifyPermission(){if(Build.VERSION.SDK_INT>=33&&ContextCompat.checkSelfPermission(this,Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED)ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.POST_NOTIFICATIONS},7001);}
+ @Override public void onRequestPermissionsResult(int r,String[]p,int[]g){super.onRequestPermissionsResult(r,p,g);if(r==4101&&g.length>0&&g[0]==PackageManager.PERMISSION_GRANTED){locate();draw();}}
 }
