@@ -41,7 +41,7 @@ public final class PrayerNotificationHelper {
         NotificationCompat.Builder b=new NotificationCompat.Builder(context,CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle("🕌 "+prayerName)
-                .setContentText("Время намаза — "+time)
+                .setContentText(("tg".equals(LanguageManager.getLanguage(context))?"Вақти намоз — ":"Время намаза — ")+time)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .setAutoCancel(true).setContentIntent(pi)
