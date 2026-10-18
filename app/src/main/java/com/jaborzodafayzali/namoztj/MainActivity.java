@@ -2,15 +2,15 @@ package com.jaborzodafayzali.namoztj;
 import android.Manifest;import android.content.*;import android.content.pm.PackageManager;import android.graphics.*;import android.location.*;import android.os.*;import android.view.*;import android.widget.*;import androidx.appcompat.app.AppCompatActivity;import androidx.core.app.ActivityCompat;import androidx.core.content.ContextCompat;import com.google.android.material.card.MaterialCardView;import com.jaborzodafayzali.namoztj.prayer.*;import java.util.*;
 public class MainActivity extends AppCompatActivity{
  final int BG=Color.rgb(9,20,17),SURFACE=Color.rgb(20,37,29),SURFACE2=Color.rgb(24,48,37),GREEN=Color.rgb(91,211,151),GOLD=Color.rgb(231,197,119),WHITE=Color.rgb(241,246,241),MUTED=Color.rgb(161,181,169);
- boolean tg(){return "tg".equals(LanguageManager.getLanguage(this));}
+ String renderedLanguage; boolean tg(){return "tg".equals(LanguageManager.getLanguage(this));}
  int D(float x){return(int)(x*getResources().getDisplayMetrics().density+.5f);}
  TextView T(String s,float z,int c,boolean b){TextView t=new TextView(this);t.setText(s);t.setTextSize(z);t.setTextColor(c);t.setTypeface(Typeface.create("sans-serif",b?Typeface.BOLD:Typeface.NORMAL));t.setGravity(Gravity.CENTER_VERTICAL);return t;}
  MaterialCardView box(int color,int radius){MaterialCardView c=new MaterialCardView(this);c.setRadius(D(radius));c.setCardBackgroundColor(color);c.setStrokeWidth(D(1));c.setStrokeColor(Color.rgb(39,62,47));return c;}
  void click(View v,String type){v.setOnClickListener(w->startActivity(new Intent(this,FeatureActivity.class).putExtra("type",type)));}
  protected void onCreate(Bundle b){LanguageManager.apply(this);super.onCreate(b);getWindow().setStatusBarColor(BG);getWindow().setNavigationBarColor(SURFACE);PrayerNotificationHelper.createChannel(this);notifyPermission();locationPermission();draw();}
- @Override protected void onResume(){super.onResume();if(findViewById(901)==null)draw();}
+ @Override protected void onResume(){super.onResume();if(findViewById(901)==null||!Objects.equals(renderedLanguage,LanguageManager.getLanguage(this)))draw();}
  void draw(){
-  boolean taj=tg();LinearLayout root=new LinearLayout(this);root.setOrientation(LinearLayout.VERTICAL);root.setBackgroundColor(BG);
+  boolean taj=tg();renderedLanguage=LanguageManager.getLanguage(this);LinearLayout root=new LinearLayout(this);root.setOrientation(LinearLayout.VERTICAL);root.setBackgroundColor(BG);
   LinearLayout top=new LinearLayout(this);top.setGravity(Gravity.CENTER_VERTICAL);top.setPadding(D(22),D(13),D(22),D(7));
   LinearLayout brand=new LinearLayout(this);brand.setOrientation(LinearLayout.VERTICAL);
   brand.addView(T("NAMOZ TJ",12,GREEN,true));brand.addView(T(taj?"Ассалому алайкум":"Ассаляму алейкум",23,WHITE,true));brand.addView(T(taj?"Ибодататон қабул шавад":"Пусть ваши молитвы будут приняты",11,MUTED,false));
