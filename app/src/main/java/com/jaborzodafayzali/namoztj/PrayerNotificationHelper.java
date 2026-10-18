@@ -46,7 +46,7 @@ public final class PrayerNotificationHelper {
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .setAutoCancel(true).setContentIntent(pi)
                 .setVibrate(new long[]{0,350,200,350});
-        if(Build.VERSION.SDK_INT<Build.VERSION_CODES.O){Uri sound=Uri.parse("android.resource://"+context.getPackageName()+"/"+R.raw.azan);b.setSound(sound,new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build());}
+        if(Build.VERSION.SDK_INT<Build.VERSION_CODES.O){Uri sound=Uri.parse("android.resource://"+context.getPackageName()+"/"+R.raw.azan);b.setSound(sound,android.media.AudioManager.STREAM_ALARM);}
         NotificationManagerCompat.from(context).notify(Math.abs((prayerName+time).hashCode()),b.build());
     }
 }
