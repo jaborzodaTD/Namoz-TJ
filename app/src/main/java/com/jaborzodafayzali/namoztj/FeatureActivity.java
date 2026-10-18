@@ -36,7 +36,7 @@ public class FeatureActivity extends AppCompatActivity{\n SensorEventListener qi
   boolean tg="tg".equals(LanguageManager.getLanguage(this));
   LinearLayout r=page(tg?"Қибла":"Кибла");LinearLayout g=new LinearLayout(this);g.setGravity(17);g.setOrientation(LinearLayout.VERTICAL);g.setPadding(D(22),D(24),D(22),D(24));
   double lat=PrayerSettings.latitude(this),lon=PrayerSettings.longitude(this);
-  double bearing=Math.toDegrees(Math.atan2(Math.sin(Math.toRadians(39.8262-lon))*Math.cos(Math.toRadians(21.4225)),Math.cos(Math.toRadians(lat))*Math.sin(Math.toRadians(21.4225))-Math.sin(Math.toRadians(lat))*Math.cos(Math.toRadians(21.4225))*Math.cos(Math.toRadians(39.8262-lon))));bearing=(bearing+360)%360;
+  double bearing=Math.toDegrees(Math.atan2(Math.sin(Math.toRadians(39.8262-lon))*Math.cos(Math.toRadians(21.4225)),Math.cos(Math.toRadians(lat))*Math.sin(Math.toRadians(21.4225))-Math.sin(Math.toRadians(lat))*Math.cos(Math.toRadians(21.4225))*Math.cos(Math.toRadians(39.8262-lon))));bearing=(bearing+360)%360;final double qiblaBearing=bearing;
   TextView compass=T("➤",92,Color.rgb(112,205,178),true);compass.setGravity(17);g.addView(compass,new LinearLayout.LayoutParams(-1,D(180)));
   TextView degree=T("",22,Color.WHITE,true);degree.setGravity(17);g.addView(degree);
   TextView status=T("",13,Color.rgb(160,178,198),false);status.setGravity(17);g.addView(status);
@@ -44,7 +44,7 @@ public class FeatureActivity extends AppCompatActivity{\n SensorEventListener qi
   SensorManager sm=(SensorManager)getSystemService(SENSOR_SERVICE);Sensor rotation=sm==null?null:sm.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
   if(rotation!=null){
    status.setText(tg?"Телефонро ҳамвор нигоҳ доред ва ба самти нишондиҳанда гардонед.":"Держите телефон горизонтально и поворачивайте его по стрелке.");
-   SensorEventListener listener=new SensorEventListener(){public void onAccuracyChanged(Sensor sensor,int accuracy){} public void onSensorChanged(SensorEvent event){float[] matrix=new float[9];float[] orientation=new float[3];SensorManager.getRotationMatrixFromVector(matrix,event.values);SensorManager.getOrientation(matrix,orientation);float azimuth=(float)Math.toDegrees(orientation[0]);compass.setRotation((float)bearing-azimuth);}};
+   SensorEventListener listener=new SensorEventListener(){public void onAccuracyChanged(Sensor sensor,int accuracy){} public void onSensorChanged(SensorEvent event){float[] matrix=new float[9];float[] orientation=new float[3];SensorManager.getRotationMatrixFromVector(matrix,event.values);SensorManager.getOrientation(matrix,orientation);float azimuth=(float)Math.toDegrees(orientation[0]);compass.setRotation((float)qiblaBearing-azimuth);}};
    sm.registerListener(listener,rotation,SensorManager.SENSOR_DELAY_UI);qiblaListener=listener;
   }else status.setText(tg?"Датчики қутбнамо дар ин телефон дастрас нестанд.":"На этом телефоне нет датчика компаса.");
   TextView foot=T(tg?"Самт аз рӯи координатҳои ҷойгиршавӣ ҳисоб карда шудааст.":"Направление рассчитано по координатам местоположения.",12,Color.rgb(130,150,170),false);foot.setGravity(17);g.addView(foot);
