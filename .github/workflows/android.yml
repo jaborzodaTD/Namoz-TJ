@@ -28,6 +28,16 @@ jobs:
       - name: Verify Gradle environment
         run: gradle --version
 
+      - name: Fetch CC0 Adhan audio
+        run: |
+          mkdir -p app/src/main/res/raw
+          curl -fL --retry 3 --retry-delay 2 \
+            -A "NamozTJ Android app (open-source project)" \
+            "https://commons.wikimedia.org/wiki/Special:Redirect/file/Beautiful_adhan.ogg" \
+            -o app/src/main/res/raw/adhan.ogg
+          test -s app/src/main/res/raw/adhan.ogg
+          file app/src/main/res/raw/adhan.ogg
+
       - name: Remove documentation accidentally placed in Android res directories
         run: |
           rm -f app/src/main/res/drawable/README.md
