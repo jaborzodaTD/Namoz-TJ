@@ -8,7 +8,7 @@ public class MainActivity extends AppCompatActivity{
  MaterialCardView box(int color,int radius){MaterialCardView c=new MaterialCardView(this);c.setRadius(D(radius));c.setCardBackgroundColor(color);c.setStrokeWidth(D(1));c.setStrokeColor(Color.rgb(39,62,47));return c;}
  void click(View v,String type){v.setOnClickListener(w->startActivity(new Intent(this,FeatureActivity.class).putExtra("type",type)));}
  protected void onCreate(Bundle b){LanguageManager.apply(this);super.onCreate(b);getWindow().setStatusBarColor(BG);getWindow().setNavigationBarColor(SURFACE);PrayerNotificationHelper.createChannel(this);notifyPermission();locationPermission();draw();}
- @Override protected void onResume(){super.onResume();if(findViewById(901)==null||!Objects.equals(renderedLanguage,LanguageManager.getLanguage(this)))draw();}
+ @Override protected void onResume(){super.onResume();if(findViewById(901)==null||!Objects.equals(renderedLanguage,LanguageManager.getLanguage(this)))draw();schedule();}
  void draw(){
   boolean taj=tg();renderedLanguage=LanguageManager.getLanguage(this);LinearLayout root=new LinearLayout(this);root.setOrientation(LinearLayout.VERTICAL);root.setBackgroundColor(BG);
   LinearLayout top=new LinearLayout(this);top.setGravity(Gravity.CENTER_VERTICAL);top.setPadding(D(22),D(13),D(22),D(7));
