@@ -1,0 +1,8 @@
+NAMOZ TJ — THIRD-PARTY CONTENT CREDITS
+
+Adhan audio: “Beautiful adhan.ogg” by Adam-synagda (2022-04-29), Wikimedia Commons.
+Source page: https://commons.wikimedia.org/wiki/File:Beautiful_adhan.ogg
+License: CC0 1.0 Universal Public Domain Dedication.
+The Android CI workflow downloads this file from Wikimedia Commons into app/src/main/res/raw/azan.ogg at build time.
+
+Quran Arabic text and Tajik translation are fetched at runtime from AlQuran Cloud API using editions quran-uthmani and tg.ayati. Translation attribution is shown in the Quran screen. Network access is required to fetch a surah the first time; cached surahs remain available offline after a successful fetch.
