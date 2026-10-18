@@ -35,8 +35,8 @@ jobs:
             -A "NamozTJ Android app (open-source project)" \
             "https://commons.wikimedia.org/wiki/Special:Redirect/file/Beautiful_adhan.ogg" \
             -o app/src/main/res/raw/azan.ogg
-          test -s app/src/main/res/raw/adhan.ogg
-          file app/src/main/res/raw/adhan.ogg
+          test -s app/src/main/res/raw/azan.ogg
+          file app/src/main/res/raw/azan.ogg
 
       - name: Remove documentation accidentally placed in Android res directories
         run: |
